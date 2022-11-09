@@ -56,7 +56,7 @@ app.get('/year/:year', (req, res) => {
                 flight_info = flight_info + '</tr>';
                 
             });
-
+            response = response.replace('%%TOPIC%%', ('Year: ' + req.params.year));
             response = response.replace('%%FLIGHT_INFO%%', flight_info);
             //console.log('images\\' + mfr + '_logo.png')
 
