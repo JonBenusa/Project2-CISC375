@@ -95,7 +95,7 @@ app.get('/dest/:dest', (req, res) => {
                 flight_info = flight_info + '</tr>';
                 
             });
-
+            response = response.replace('%%TOPIC%%', ('Destination Airport: ' + req.params.dest));
             response = response.replace('%%FLIGHT_INFO%%', flight_info);
             //console.log('images\\' + mfr + '_logo.png')
 
@@ -134,7 +134,8 @@ app.get('/orig/:orig', (req, res) => {
                 flight_info = flight_info + '</tr>';
                 
             });
-
+            
+            response = response.replace('%%TOPIC%%', ('Origin Airport: ' + req.params.orig));
             response = response.replace('%%FLIGHT_INFO%%', flight_info);
             //console.log('images\\' + mfr + '_logo.png')
 
