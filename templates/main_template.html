@@ -9,33 +9,34 @@
 <body>
     <div class="grid-container">
         <div style = "text-align: center;" class="grid-x grid-padding-x show-for-medium ">
-            <div class="cell medium-4" style="background-color: #000000;"> <a href="/year/2000" style = "color: white; font-size: 1.6rem;">Year</a> </div>
-            <div class="cell medium-4" style="background-color: #000000;"> <a href="/dest/RDM " style = "color: white; font-size: 1.6rem;">Destination</a> </div>
-            <div class="cell medium-4" style="background-color: #000000;"> <a href="/orig/LAX" style = "color: white; font-size: 1.6rem;">Origin</a> </div>
+            <div class="cell small-4" style="background-color: #000000;"> <a href="/year/2000" style = "color: white; font-size: 1.6rem;">Year</a> </div>
+            <div class="cell small-4" style="background-color: #000000;"> <a href="/dest/RDM " style = "color: white; font-size: 1.6rem;">Destination</a> </div>
+            <div class="cell small-4" style="background-color: #000000;"> <a href="/orig/LAX" style = "color: white; font-size: 1.6rem;">Origin</a> </div>
+            <div class="cell small-12"> 
+                <div id="content">
+                    <h1 id="manufacturer_name">%%TOPIC%%</h1>
+                    <div class="clear"></div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Origin</th>
+                                <th>Destination</th>
+                                <th>Flight Count</th>
+                                <th>Seats</th>
+                                <th>Passenger Count</th>
+                                <th>Distance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            %%FLIGHT_INFO%%
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
     </div>
 
-    <div id="content">
-        <!-- <img id="manufacturer_img" src="%%MFR_IMAGE%%" alt="%%MFR_ALT_TEXT%%" /> -->
-        <h1 id="manufacturer_name">%%TOPIC%%</h1>
-        <div class="clear"></div>
-        <table>
-            <thead>
-                <tr>
-                    <!-- <th class="flight_title">Flights</th> -->
-                    <th>Date</th>
-                    <th>Origin</th>
-                    <th>Destination</th>
-                    <th>Flight Count</th>
-                    <th>Seats</th>
-                    <th>Passenger Count</th>
-                    <th>Distance</th>
-                </tr>
-            </thead>
-            <tbody>
-                %%FLIGHT_INFO%%
-            </tbody>
-        </table>
 </body>
 </html>
