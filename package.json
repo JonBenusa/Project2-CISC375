@@ -3,23 +3,23 @@
     "version": "0.0.0",
     "description": "Dynamic Web Server using Node JS",
     "author": {
-        "name": "",
-        "email": ""
+        "name": "Jonathon Benusa",
+        "email": "jonathan.benusa@stthomas.edu"
     },
     "contributors": [
         {
-            "name": "",
-            "email": ""
+            "name": "David Braun",
+            "email": "david.braun@stthomas.edu"
         },
         {
-            "name": "",
-            "email": ""
+            "name": "Owen Hiskey",
+            "email": "hisk2323@stthomas.edu"
         }
     ],
     "main": "server.js",
     "repository": {
         "type": "git",
-        "url": ""
+        "url": "https://github.com/JonBenusa/Project2-CISC375"
     },
     "dependencies": {
         "express": "^4.18.2",

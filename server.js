@@ -27,6 +27,10 @@ let db = new sqlite3.Database(db_filename, sqlite3.OPEN_READONLY, (err) => {
 // Serve static files from 'public' directory
 app.use(express.static(public_dir));
 
+app.get('/', (req,res)=>{
+    let home = './year/2000'; // <-- change this
+    res.redirect(home);
+})
 
 // GET request handler for home page '/' (redirect to desired route)
 app.get('/year/:year', (req, res) => {
@@ -64,8 +68,6 @@ app.get('/year/:year', (req, res) => {
         });
     });
 
-    //let home = './public'; // <-- change this
-    //res.redirect(home);
 });
 
 app.get('/dest/:dest', (req, res) => {
@@ -103,8 +105,6 @@ app.get('/dest/:dest', (req, res) => {
         });
     });
 
-    //let home = './public'; // <-- change this
-    //res.redirect(home);
 });
 
 app.get('/orig/:orig', (req, res) => {
@@ -143,8 +143,6 @@ app.get('/orig/:orig', (req, res) => {
         });
     });
 
-    //let home = './public'; // <-- change this
-    //res.redirect(home);
 });
 
 
