@@ -62,6 +62,18 @@ app.get('/year/:year', (req, res) => {
             });
             response = response.replace('%%TOPIC%%', ('Year: ' + req.params.year));
             response = response.replace('%%FLIGHT_INFO%%', flight_info);
+
+            if (req.params.year == 2009) {
+                response = response.replace('%%NEXT%%', '/year/1999'); //wrap back around to end
+            }  else {
+                response = response.replace('%%NEXT%%', ('/year/' + (parseInt(req.params.year) + 1)));
+            }
+
+            if (req.params.year == 1999) {
+                response = response.replace('%%PREV%%', '/year/2009'); //wrap around to beginning
+            } else {
+                response = response.replace('%%PREV%%', ('/year/' + (parseInt(req.params.year) - 1)));
+            }
             //console.log('images\\' + mfr + '_logo.png')
 
             res.status(200).type('html').send(response);
