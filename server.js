@@ -23,6 +23,15 @@ let db = new sqlite3.Database(db_filename, sqlite3.OPEN_READONLY, (err) => {
         console.log('Now connected to ' + path.basename(db_filename));
     }
 });
+let airports = [];
+db.all('SELECT DISTINCT flightdata.Origin_airport FROM flightdata', (err, rows) => { // Sort all the airports so we can use prev and next buttons
+    for (let i = 0; i < rows.length; i++) {
+        airports.push(rows[i].Origin_airport);
+    }
+    airports = airports.sort();
+    //first airport: ABE
+    //last airport: ZZV
+});
 
 // Serve static files from 'public' directory
 app.use(express.static(public_dir));
@@ -64,13 +73,13 @@ app.get('/year/:year', (req, res) => {
             response = response.replace('%%FLIGHT_INFO%%', flight_info);
 
             if (req.params.year == 2009) {
-                response = response.replace('%%NEXT%%', '/year/1999'); //wrap back around to end
+                response = response.replace('%%NEXT%%', '/year/1999'); //wrap back around to beginning
             }  else {
                 response = response.replace('%%NEXT%%', ('/year/' + (parseInt(req.params.year) + 1)));
             }
 
             if (req.params.year == 1999) {
-                response = response.replace('%%PREV%%', '/year/2009'); //wrap around to beginning
+                response = response.replace('%%PREV%%', '/year/2009'); //wrap around to end
             } else {
                 response = response.replace('%%PREV%%', ('/year/' + (parseInt(req.params.year) - 1)));
             }
@@ -113,6 +122,18 @@ app.get('/dest/:dest', (req, res) => {
             response = response.replace('%%FLIGHT_INFO%%', flight_info);
             //console.log('images\\' + mfr + '_logo.png')
 
+            if (req.params.dest == 'ZZV') {
+                response = response.replace('%%NEXT%%', '/dest/ABE'); //wrap back around to beginning
+            }  else {
+                response = response.replace('%%NEXT%%', ('/dest/' + airports[(airports.indexOf(req.params.dest) + 1)]));
+            }
+
+            if (req.params.dest == 'ABE') {
+                response = response.replace('%%PREV%%', '/dest/ZZV'); //wrap back around to beginning
+            }  else {
+                response = response.replace('%%PREV%%', ('/dest/' + airports[(airports.indexOf(req.params.dest) - 1)]));
+            }
+
             res.status(200).type('html').send(response);
         });
     });
@@ -149,6 +170,18 @@ app.get('/orig/:orig', (req, res) => {
             
             response = response.replace('%%TOPIC%%', ('Origin Airport: ' + req.params.orig));
             response = response.replace('%%FLIGHT_INFO%%', flight_info);
+
+            if (req.params.orig == 'ZZV') {
+                response = response.replace('%%NEXT%%', '/orig/ABE'); //wrap back around to beginning
+            }  else {
+                response = response.replace('%%NEXT%%', ('/orig/' + airports[(airports.indexOf(req.params.orig) + 1)]));
+            }
+
+            if (req.params.orig == 'ABE') {
+                response = response.replace('%%PREV%%', '/orig/ZZV'); //wrap back around to beginning
+            }  else {
+                response = response.replace('%%PREV%%', ('/orig/' + airports[(airports.indexOf(req.params.orig) - 1)]));
+            }
             //console.log('images\\' + mfr + '_logo.png')
 
             res.status(200).type('html').send(response);
