@@ -103,6 +103,12 @@ app.get('/dest/:dest', (req, res) => {
             console.log(err);
             console.log(rows);
 
+            if (rows.keys.length === 0) {
+                console.log('yes');
+                // No data for destination + dest param
+                //Check if it's a valid destination city (i.e., check if it's in the airports list)
+            }
+
             let response = template.toString();
             
             let flight_info = '';
@@ -129,7 +135,7 @@ app.get('/dest/:dest', (req, res) => {
             }
 
             if (req.params.dest == 'ABE') {
-                response = response.replace('%%PREV%%', '/dest/ZZV'); //wrap back around to beginning
+                response = response.replace('%%PREV%%', '/dest/ZZV'); //wrap around to end
             }  else {
                 response = response.replace('%%PREV%%', ('/dest/' + airports[(airports.indexOf(req.params.dest) - 1)]));
             }
@@ -178,7 +184,7 @@ app.get('/orig/:orig', (req, res) => {
             }
 
             if (req.params.orig == 'ABE') {
-                response = response.replace('%%PREV%%', '/orig/ZZV'); //wrap back around to beginning
+                response = response.replace('%%PREV%%', '/orig/ZZV'); //wrap around to end
             }  else {
                 response = response.replace('%%PREV%%', ('/orig/' + airports[(airports.indexOf(req.params.orig) - 1)]));
             }
