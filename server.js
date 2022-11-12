@@ -23,6 +23,7 @@ let db = new sqlite3.Database(db_filename, sqlite3.OPEN_READONLY, (err) => {
         console.log('Now connected to ' + path.basename(db_filename));
     }
 });
+
 let airports = [];
 db.all('SELECT DISTINCT flightdata.Origin_airport FROM flightdata', (err, rows) => { // Sort all the airports so we can use prev and next buttons
     for (let i = 0; i < rows.length; i++) {
@@ -36,26 +37,26 @@ db.all('SELECT DISTINCT flightdata.Origin_airport FROM flightdata', (err, rows) 
 // Serve static files from 'public' directory
 app.use(express.static(public_dir));
 
-app.get('/', (req,res)=>{
+app.get('/', (req, res) => {
     let home = './year/2000'; // <-- change this
     res.redirect(home);
 })
 
 // GET request handler for home page '/' (redirect to desired route)
 app.get('/year/:year', (req, res) => {
-    
+
     fs.readFile(path.join(template_dir, 'main_template.html'), (err, template) => {
         // modify `template` and send response
         // this will require a query to the SQL database
         let query = 'SELECT flightdata.Origin_airport, flightdata.Destination_airport, flightdata.Passengers,\
          flightdata.Seats, flightdata.Flights, flightdata.Distance, flightdata.Fly_date FROM flightdata WHERE flightdata.year = ? LIMIT 50';
 
-        db.all(query, [req.params.year] ,(err, rows)=>{
+        db.all(query, [req.params.year], (err, rows) => {
             console.log(err);
             console.log(rows);
 
             let response = template.toString();
-            
+
             let flight_info = '';
             rows.forEach(element => {
                 flight_info = flight_info + '<tr>';
@@ -67,50 +68,48 @@ app.get('/year/:year', (req, res) => {
                 flight_info = flight_info + '<td>' + element.Passengers + '</td>';
                 flight_info = flight_info + '<td>' + element.Distance + '</td>';
                 flight_info = flight_info + '</tr>';
-                
-            });
-            response = response.replace('%%TOPIC%%', ('Year: ' + req.params.year));
-            response = response.replace('%%FLIGHT_INFO%%', flight_info);
 
+            });
             if (req.params.year == 2009) {
                 response = response.replace('%%NEXT%%', '/year/1999'); //wrap back around to beginning
-            }  else {
+            } else {
                 response = response.replace('%%NEXT%%', ('/year/' + (parseInt(req.params.year) + 1)));
             }
-
             if (req.params.year == 1999) {
                 response = response.replace('%%PREV%%', '/year/2009'); //wrap around to end
             } else {
                 response = response.replace('%%PREV%%', ('/year/' + (parseInt(req.params.year) - 1)));
             }
-            //console.log('images\\' + mfr + '_logo.png')
 
-            res.status(200).type('html').send(response);
+            if (parseInt(req.params.year) > 2009 || parseInt(req.params.year) < 1999) { // the dataset only has flights between 1999 and 20009
+                response = response.replace('%%TOPIC%%', 'Error: Invalid Year!');
+                response = response.replace('%%FLIGHT_INFO%%', 'Sorry, the dataset only has data for flights between 1999 and 2009. ' + req.params.year + ' is not within this range.');
+                res.status(404).type('html').send(response);
+            } else {
+                response = response.replace('%%TOPIC%%', ('Year: ' + req.params.year));
+                response = response.replace('%%FLIGHT_INFO%%', flight_info);
+                res.status(200).type('html').send(response);
+            }
+            //console.log('images\\' + mfr + '_logo.png')
         });
     });
 
 });
 
 app.get('/dest/:dest', (req, res) => {
-    
+
     fs.readFile(path.join(template_dir, 'main_template.html'), (err, template) => {
-        
+
         let query = 'SELECT flightdata.Origin_airport, flightdata.Destination_airport, flightdata.Passengers,\
          flightdata.Seats, flightdata.Flights, flightdata.Distance, flightdata.Fly_date FROM flightdata WHERE flightdata.Destination_airport = ? LIMIT 50';
 
         console.log(req.params.dest);
-        db.all(query, [req.params.dest] ,(err, rows)=>{
+        db.all(query, [req.params.dest], (err, rows) => {
             console.log(err);
             console.log(rows);
 
-            if (rows.keys.length === 0) {
-                console.log('yes');
-                // No data for destination + dest param
-                //Check if it's a valid destination city (i.e., check if it's in the airports list)
-            }
-
             let response = template.toString();
-            
+
             let flight_info = '';
             rows.forEach(element => {
                 flight_info = flight_info + '<tr>';
@@ -122,44 +121,56 @@ app.get('/dest/:dest', (req, res) => {
                 flight_info = flight_info + '<td>' + element.Passengers + '</td>';
                 flight_info = flight_info + '<td>' + element.Distance + '</td>';
                 flight_info = flight_info + '</tr>';
-                
+
             });
-            response = response.replace('%%TOPIC%%', ('Destination Airport: ' + req.params.dest));
-            response = response.replace('%%FLIGHT_INFO%%', flight_info);
-            //console.log('images\\' + mfr + '_logo.png')
 
             if (req.params.dest == 'ZZV') {
                 response = response.replace('%%NEXT%%', '/dest/ABE'); //wrap back around to beginning
-            }  else {
+            } else {
                 response = response.replace('%%NEXT%%', ('/dest/' + airports[(airports.indexOf(req.params.dest) + 1)]));
             }
 
             if (req.params.dest == 'ABE') {
                 response = response.replace('%%PREV%%', '/dest/ZZV'); //wrap around to end
-            }  else {
+            } else {
                 response = response.replace('%%PREV%%', ('/dest/' + airports[(airports.indexOf(req.params.dest) - 1)]));
             }
 
-            res.status(200).type('html').send(response);
+            if (flight_info.length == 0) { // if there is no flight info, we must send an error
+                if (airports.indexOf(req.params.dest) >= 0) { // if it's a valid airport, we can say there is no data
+                    response = response.replace('%%FLIGHT_INFO%%', 'Sorry, no data exists in the dataset for destination airport ' + req.params.dest);
+                    response = response.replace('%%TOPIC%%', 'Error: No data');
+                    res.status(404).type('html').send(response);
+                } else { // if it's not a valid airport, we can say that as the error
+                    response = response.replace('%%FLIGHT_INFO%%', 'Sorry, ' + req.params.dest + ' is not a valid airport!');
+                    response = response.replace('%%TOPIC%%', 'Error: Invalid Destination Airport!');
+                    res.status(404).type('html').send(response);
+                }
+            } else {
+                response = response.replace('%%TOPIC%%', ('Destination Airport: ' + req.params.dest));
+                response = response.replace('%%FLIGHT_INFO%%', flight_info);
+                //console.log('images\\' + mfr + '_logo.png')
+                res.status(200).type('html').send(response);
+            }
         });
     });
 
 });
 
 app.get('/orig/:orig', (req, res) => {
-    
+
     fs.readFile(path.join(template_dir, 'main_template.html'), (err, template) => {
         // modify `template` and send response
         // this will require a query to the SQL database
         let query = 'SELECT flightdata.Origin_airport, flightdata.Destination_airport, flightdata.Passengers,\
          flightdata.Seats, flightdata.Flights, flightdata.Distance, flightdata.Fly_date FROM flightdata WHERE flightdata.Origin_airport = ? LIMIT 50';
 
-        db.all(query, [req.params.orig] ,(err, rows)=>{
+        db.all(query, [req.params.orig], (err, rows) => {
             console.log(err);
             console.log(rows);
 
             let response = template.toString();
-            
+
             let flight_info = '';
             rows.forEach(element => {
                 flight_info = flight_info + '<tr>';
@@ -171,29 +182,39 @@ app.get('/orig/:orig', (req, res) => {
                 flight_info = flight_info + '<td>' + element.Passengers + '</td>';
                 flight_info = flight_info + '<td>' + element.Distance + '</td>';
                 flight_info = flight_info + '</tr>';
-                
+
             });
-            
-            response = response.replace('%%TOPIC%%', ('Origin Airport: ' + req.params.orig));
-            response = response.replace('%%FLIGHT_INFO%%', flight_info);
 
             if (req.params.orig == 'ZZV') {
                 response = response.replace('%%NEXT%%', '/orig/ABE'); //wrap back around to beginning
-            }  else {
+            } else {
                 response = response.replace('%%NEXT%%', ('/orig/' + airports[(airports.indexOf(req.params.orig) + 1)]));
             }
 
             if (req.params.orig == 'ABE') {
                 response = response.replace('%%PREV%%', '/orig/ZZV'); //wrap around to end
-            }  else {
+            } else {
                 response = response.replace('%%PREV%%', ('/orig/' + airports[(airports.indexOf(req.params.orig) - 1)]));
             }
-            //console.log('images\\' + mfr + '_logo.png')
 
-            res.status(200).type('html').send(response);
+            if (flight_info.length == 0) { // if there is no flight info, we must send an error
+                if (airports.indexOf(req.params.orig) >= 0) { // if it's a valid airport, we can say there is no data
+                    response = response.replace('%%FLIGHT_INFO%%', 'Sorry, no data exists in the dataset for origin airport ' + req.params.orig);
+                    response = response.replace('%%TOPIC%%', 'Error: No data');
+                    res.status(404).type('html').send(response);
+                } else { // if it's not a valid airport, we can say that as the error
+                    response = response.replace('%%FLIGHT_INFO%%', 'Sorry, ' + req.params.orig + ' is not a valid airport!');
+                    response = response.replace('%%TOPIC%%', 'Error: Invalid Origin Airport!');
+                    res.status(404).type('html').send(response);
+                }
+            } else { // if there is at least one flight we can send the data like normal
+                response = response.replace('%%TOPIC%%', ('Origin Airport: ' + req.params.orig));
+                response = response.replace('%%FLIGHT_INFO%%', flight_info);
+                //console.log('images\\' + mfr + '_logo.png')
+                res.status(200).type('html').send(response);
+            }
         });
     });
-
 });
 
 
