@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flight Data</title>
     <link rel="stylesheet" type="text/css" href="/css/foundation.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -18,9 +19,11 @@
                     style="color: white; font-size: 1.6rem;">Destination</a> </div>
             <div class="cell small-4" style="background-color: #000000;"> <a href="/orig/LAX"
                     style="color: white; font-size: 1.6rem;">Origin</a> </div>
-            <div class="cell small-12">
+            <div class="cell small-6"> <h1 id="manufacturer_name">%%TOPIC%%</h1> </div>
+            <div class="cell small-6"> <div id ="map"></div> </div>
+            <div class="cell small-12"> 
                 <div id="content">
-                    <h1 id="manufacturer_name">%%TOPIC%%</h1>
+                    
                     <div class="clear"></div>
                     <table>
                         <thead>
@@ -89,6 +92,24 @@
             });
             </script>
     </div>
+
+   
+
+    </div>
+
+    <script>
+        function initMap() {
+            var macc = {lat: AirportLat, lng: AirportLong};
+            var map = new google.maps.Map(
+                document.getElementById('map'), {zoom: 4, center: macc});
+            var marker = new google.maps.Marker({position: macc, map: map});
+        }
+    </script>
+
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCUSeY6gQCup2dan4EFfm2J9Z3Jsb1xDPc&callback=initMap">
+    </script>
+
 
 </body>
 

@@ -70,6 +70,9 @@ app.get('/year/:year', (req, res) => {
                 flight_info = flight_info + '</tr>';
 
             });
+
+            response = response.replace('<div class="cell small-6"> <div id ="map"></div> </div>' , "" );
+
             if (req.params.year == 2009) {
                 response = response.replace('%%NEXT%%', '/year/1999'); //wrap back around to beginning
             } else {
@@ -100,7 +103,7 @@ app.get('/dest/:dest', (req, res) => {
 
     fs.readFile(path.join(template_dir, 'main_template.html'), (err, template) => {
 
-        let query = 'SELECT flightdata.Origin_airport, flightdata.Destination_airport, flightdata.Passengers,\
+        let query = 'SELECT flightdata.Origin_airport, flightdata.Destination_airport, flightdata.Passengers, flightdata.Dest_airport_lat, flightdata.Dest_airport_long, \
          flightdata.Seats, flightdata.Flights, flightdata.Distance, flightdata.Fly_date FROM flightdata WHERE flightdata.Destination_airport = ? LIMIT 50';
 
         console.log(req.params.dest);
@@ -123,6 +126,9 @@ app.get('/dest/:dest', (req, res) => {
                 flight_info = flight_info + '</tr>';
 
             });
+
+            response = response.replace('AirportLat', rows[0].Dest_airport_lat);
+            response = response.replace('AirportLong', rows[0].Dest_airport_long);
 
             if (req.params.dest == 'ZZV') {
                 response = response.replace('%%NEXT%%', '/dest/ABE'); //wrap back around to beginning
@@ -162,7 +168,7 @@ app.get('/orig/:orig', (req, res) => {
     fs.readFile(path.join(template_dir, 'main_template.html'), (err, template) => {
         // modify `template` and send response
         // this will require a query to the SQL database
-        let query = 'SELECT flightdata.Origin_airport, flightdata.Destination_airport, flightdata.Passengers,\
+        let query = 'SELECT flightdata.Origin_airport, flightdata.Destination_airport, flightdata.Passengers, flightdata.Org_airport_lat, flightdata.Org_airport_long, \
          flightdata.Seats, flightdata.Flights, flightdata.Distance, flightdata.Fly_date FROM flightdata WHERE flightdata.Origin_airport = ? LIMIT 50';
 
         db.all(query, [req.params.orig], (err, rows) => {
@@ -184,6 +190,9 @@ app.get('/orig/:orig', (req, res) => {
                 flight_info = flight_info + '</tr>';
 
             });
+
+            response = response.replace('AirportLat', rows[0].Org_airport_lat);
+            response = response.replace('AirportLong', rows[0].Org_airport_long);
 
             if (req.params.orig == 'ZZV') {
                 response = response.replace('%%NEXT%%', '/orig/ABE'); //wrap back around to beginning
