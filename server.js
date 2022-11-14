@@ -158,8 +158,7 @@ app.get('/dest/:dest', (req, res) => {
 
             });  
             
-            response = response.replace('AirportLat', rows[0].Dest_airport_lat);
-            response = response.replace('AirportLong', rows[0].Dest_airport_long);
+
 
             if (req.params.dest == 'ZZV') {
                 response = response.replace('%%NEXT%%', '/dest/ABE'); //wrap back around to beginning
@@ -177,15 +176,25 @@ app.get('/dest/:dest', (req, res) => {
                 if (airports.indexOf(req.params.dest) >= 0) { // if it's a valid airport, we can say there is no data
                     response = response.replace('%%FLIGHT_INFO%%', 'Sorry, no data exists in the dataset for destination airport ' + req.params.dest);
                     response = response.replace('%%TOPIC%%', 'Error: No data');
+                    response = response.replace('AirportLat', '');
+                    response = response.replace('AirportLong', '');
+                    response = response.replace('<div class="cell small-6"> <div id ="map"></div> </div>' , "" );
+                    response = response.replace('<canvas id="myChart" width="400" height="400"></canvas>', '');
                     res.status(404).type('html').send(response);
                 } else { // if it's not a valid airport, we can say that as the error
                     response = response.replace('%%FLIGHT_INFO%%', 'Sorry, ' + req.params.dest + ' is not a valid airport!');
                     response = response.replace('%%TOPIC%%', 'Error: Invalid Destination Airport!');
+                    response = response.replace('AirportLat', '');
+                    response = response.replace('AirportLong', '');
+                    response = response.replace('<div class="cell small-6"> <div id ="map"></div> </div>' , "" );
+                    response = response.replace('<canvas id="myChart" width="400" height="400"></canvas>', '');
                     res.status(404).type('html').send(response);
                 }
             } else {
                 response = response.replace('%%TOPIC%%', ('Destination Airport: ' + req.params.dest));
                 response = response.replace('%%FLIGHT_INFO%%', flight_info);
+                response = response.replace('AirportLat', rows[0].Dest_airport_lat);
+                response = response.replace('AirportLong', rows[0].Dest_airport_long);
                 
                 res.status(200).type('html').send(response);
             }
@@ -239,8 +248,7 @@ app.get('/orig/:orig', (req, res) => {
 
             });
 
-            response = response.replace('AirportLat', rows[0].Org_airport_lat);
-            response = response.replace('AirportLong', rows[0].Org_airport_long);
+
 
             if (req.params.orig == 'ZZV') {
                 response = response.replace('%%NEXT%%', '/orig/ABE'); //wrap back around to beginning
@@ -258,15 +266,25 @@ app.get('/orig/:orig', (req, res) => {
                 if (airports.indexOf(req.params.orig) >= 0) { // if it's a valid airport, we can say there is no data
                     response = response.replace('%%FLIGHT_INFO%%', 'Sorry, no data exists in the dataset for origin airport ' + req.params.orig);
                     response = response.replace('%%TOPIC%%', 'Error: No data');
+                    response = response.replace('AirportLat', '');
+                    response = response.replace('AirportLong', '');
+                    response = response.replace('<div class="cell small-6"> <div id ="map"></div> </div>' , "" );
+                    response = response.replace('<canvas id="myChart" width="400" height="400"></canvas>', '');
                     res.status(404).type('html').send(response);
                 } else { // if it's not a valid airport, we can say that as the error
                     response = response.replace('%%FLIGHT_INFO%%', 'Sorry, ' + req.params.orig + ' is not a valid airport!');
                     response = response.replace('%%TOPIC%%', 'Error: Invalid Origin Airport!');
+                    response = response.replace('AirportLat', '');
+                    response = response.replace('AirportLong', '');
+                    response = response.replace('<div class="cell small-6"> <div id ="map"></div> </div>' , "" );
+                    response = response.replace('<canvas id="myChart" width="400" height="400"></canvas>', '');
                     res.status(404).type('html').send(response);
                 }
             } else { // if there is at least one flight we can send the data like normal
                 response = response.replace('%%TOPIC%%', ('Origin Airport: ' + req.params.orig));
                 response = response.replace('%%FLIGHT_INFO%%', flight_info);
+                response = response.replace('AirportLat', rows[0].Org_airport_lat);
+                response = response.replace('AirportLong', rows[0].Org_airport_long);
                 
                 res.status(200).type('html').send(response);
             }
