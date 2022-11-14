@@ -136,6 +136,26 @@ app.get('/dest/:dest', (req, res) => {
 
             });
 
+
+            let full_query = 'SELECT flightdata.Origin_airport, flightdata.Destination_airport, flightdata.Passengers, flightdata.Dest_airport_lat, flightdata.Dest_airport_long, \
+            flightdata.Seats, flightdata.Flights, flightdata.Distance, flightdata.Fly_date FROM flightdata WHERE flightdata.Destination_airport = ?';
+            let graph_data = [0,0,0,0,0,0,0,0,0,0,0];
+            const lables = Array.from({length: 10}, (_, index) => index + 1);  
+            db.all(full_query, [req.params.dest], (err, rows) => {
+                console.log(err);
+                console.log(rows);
+                
+                const index = 1999;
+                rows.forEach(e => {
+                    let index = e.Fly_date.split('/')[2];
+                    graph_data[index-1999] = graph_data[index-1999] + 1;
+                });
+                  
+            });  
+            response = response.replace('%%DATA%%', graph_data);
+            response = response.replace('%%LABLE%%', [1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009]);
+            response = response.replace('%%TITLE%%', 'FLights Per Year')
+
             response = response.replace('AirportLat', rows[0].Dest_airport_lat);
             response = response.replace('AirportLong', rows[0].Dest_airport_long);
 
