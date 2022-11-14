@@ -70,6 +70,15 @@ app.get('/year/:year', (req, res) => {
                 flight_info = flight_info + '</tr>';
 
             });
+            
+            let graph_data = [0,0,0,0,0,0,0,0,0,0,0,0];
+            rows.forEach(e => {
+                let index = e.Fly_date.split('/')[0];
+                graph_data[index] = graph_data[index] + 1;
+            });
+            response = response.replace('%%DATA%%', graph_data);
+            response = response.replace('%%LABLE%%', 'JFMAMJJASOND')
+            response = response.replace('%%TITLE%%', 'FLights Per Month')
 
             response = response.replace('<div class="cell small-6"> <div id ="map"></div> </div>' , "" );
 

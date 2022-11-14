@@ -7,7 +7,7 @@
     <title>Flight Data</title>
     <link rel="stylesheet" type="text/css" href="/css/foundation.css">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
-    <!--<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -51,17 +51,17 @@
                 <a href=%%NEXT%% class="button" style="float: right;">Next</a>
             </div>
         </div>
-        <!--
+        
         <canvas id="myChart" width="400" height="400"></canvas>
         <script>
             const ctx = document.getElementById('myChart').getContext('2d');
             const myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                    labels: '%%LABLE%%',
                     datasets: [{
-                        label: '# of Votes',
-                        data: [12, 19, 3, 5, 2, 3],
+                        label: '%%TITLE%%',
+                        data: '%%DATA%%',
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
                             'rgba(54, 162, 235, 0.2)',
@@ -89,7 +89,7 @@
                     }
                 }
             });
-            </script> -->
+            </script>
     </div>
 
    
