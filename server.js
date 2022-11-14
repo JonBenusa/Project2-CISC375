@@ -57,7 +57,7 @@ app.get('/year/:year', (req, res) => {
                 let index = parseInt(e.Fly_date.split('/')[0]);
                 graph_data[index-1] = graph_data[index-1] + 1;
             });
-            console.log(graph_data);
+            
             response = response.replace('GRAPHDATA', graph_data.toString());
             response = response.replace('CHARTLABELS', "'January','Febuary','March','April','May','June','July','August','September','October','November','December'");
             response = response.replace('%%TITLE%%', 'Flights Per Month');
@@ -68,7 +68,7 @@ app.get('/year/:year', (req, res) => {
 
          db.all(query, [req.params.year], (err, rows) => {
             console.log(err);
-            console.log(rows);
+            
 
             let flight_info = '';
             rows.forEach(element => {
@@ -119,28 +119,30 @@ app.get('/dest/:dest', (req, res) => {
 
         let response = template.toString();
 
-        let query = 'SELECT flightdata.Origin_airport, flightdata.Destination_airport, flightdata.Passengers,\
-         flightdata.Seats, flightdata.Flights, flightdata.Distance, flightdata.Fly_date FROM flightdata WHERE flightdata.year = ?';
+        let query = 'SELECT flightdata.Origin_airport, flightdata.Destination_airport, flightdata.Passengers, flightdata.Dest_airport_lat, flightdata.Dest_airport_long, \
+         flightdata.Seats, flightdata.Flights, flightdata.Distance, flightdata.Fly_date FROM flightdata WHERE flightdata.Destination_airport = ?' ;
 
-         db.all(query, [req.params.year], (err, rows) => {
+         db.all(query, [req.params.dest], (err, rows) => {
             let graph_data = [0,0,0,0,0,0,0,0,0,0,0];
+            console.log(rows);
             rows.forEach(e => {
                 let index = parseInt(e.Fly_date.split('/')[2]);
                 graph_data[index-1999] = graph_data[index-1999] + 1;
             });
             console.log(graph_data);
             response = response.replace('GRAPHDATA', graph_data.toString());
-            response = response.replace('CHARTLABELS', "'1999','2000','2001,'2002,'2003','2004','2005','2006','2007','2008','2009'");
+            response = response.replace('CHARTLABELS', "'1999','2000','2001','2002','2003','2004','2005','2006','2007','2008','2009'");
             response = response.replace('%%TITLE%%', 'Flights Per Month');
          });
+         
 
         query = 'SELECT flightdata.Origin_airport, flightdata.Destination_airport, flightdata.Passengers, flightdata.Dest_airport_lat, flightdata.Dest_airport_long, \
          flightdata.Seats, flightdata.Flights, flightdata.Distance, flightdata.Fly_date FROM flightdata WHERE flightdata.Destination_airport = ? LIMIT 50';
 
-        console.log(req.params.dest);
+        
         db.all(query, [req.params.dest], (err, rows) => {
             console.log(err);
-            console.log(rows);
+            
 
             let flight_info = '';
             rows.forEach(element => {
@@ -154,28 +156,8 @@ app.get('/dest/:dest', (req, res) => {
                 flight_info = flight_info + '<td>' + element.Distance + '</td>';
                 flight_info = flight_info + '</tr>';
 
-            });
-
-
-            let full_query = 'SELECT flightdata.Origin_airport, flightdata.Destination_airport, flightdata.Passengers, flightdata.Dest_airport_lat, flightdata.Dest_airport_long, \
-            flightdata.Seats, flightdata.Flights, flightdata.Distance, flightdata.Fly_date FROM flightdata WHERE flightdata.Destination_airport = ?';
-            let graph_data = [0,0,0,0,0,0,0,0,0,0,0];
-            const lables = Array.from({length: 10}, (_, index) => index + 1);  
-            db.all(full_query, [req.params.dest], (err, rows) => {
-                console.log(err);
-                console.log(rows);
-                
-                const index = 1999;
-                rows.forEach(e => {
-                    let index = e.Fly_date.split('/')[2];
-                    graph_data[index-1999] = graph_data[index-1999] + 1;
-                });
-                  
             });  
-            response = response.replace('%%DATA%%', graph_data);
-            response = response.replace('%%LABLE%%', [1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009]);
-            response = response.replace('%%TITLE%%', 'FLights Per Year')
-
+            
             response = response.replace('AirportLat', rows[0].Dest_airport_lat);
             response = response.replace('AirportLong', rows[0].Dest_airport_long);
 
@@ -204,7 +186,7 @@ app.get('/dest/:dest', (req, res) => {
             } else {
                 response = response.replace('%%TOPIC%%', ('Destination Airport: ' + req.params.dest));
                 response = response.replace('%%FLIGHT_INFO%%', flight_info);
-                //console.log('images\\' + mfr + '_logo.png')
+                
                 res.status(200).type('html').send(response);
             }
         });
@@ -215,16 +197,33 @@ app.get('/dest/:dest', (req, res) => {
 app.get('/orig/:orig', (req, res) => {
 
     fs.readFile(path.join(template_dir, 'main_template.html'), (err, template) => {
-        // modify `template` and send response
-        // this will require a query to the SQL database
+
+        let response = template.toString();
+        
         let query = 'SELECT flightdata.Origin_airport, flightdata.Destination_airport, flightdata.Passengers, flightdata.Org_airport_lat, flightdata.Org_airport_long, \
+         flightdata.Seats, flightdata.Flights, flightdata.Distance, flightdata.Fly_date FROM flightdata WHERE flightdata.Origin_airport = ?';
+
+
+         db.all(query, [req.params.orig], (err, rows) => {
+            let graph_data = [0,0,0,0,0,0,0,0,0,0,0];
+            console.log(rows);
+            rows.forEach(e => {
+                let index = parseInt(e.Fly_date.split('/')[2]);
+                graph_data[index-1999] = graph_data[index-1999] + 1;
+            });
+            console.log(graph_data);
+            response = response.replace('GRAPHDATA', graph_data.toString());
+            response = response.replace('CHARTLABELS', "'1999','2000','2001','2002','2003','2004','2005','2006','2007','2008','2009'");
+            response = response.replace('%%TITLE%%', 'Flights Per Month');
+         });
+
+
+         query = 'SELECT flightdata.Origin_airport, flightdata.Destination_airport, flightdata.Passengers, flightdata.Org_airport_lat, flightdata.Org_airport_long, \
          flightdata.Seats, flightdata.Flights, flightdata.Distance, flightdata.Fly_date FROM flightdata WHERE flightdata.Origin_airport = ? LIMIT 50';
 
         db.all(query, [req.params.orig], (err, rows) => {
             console.log(err);
-            console.log(rows);
-
-            let response = template.toString();
+            
 
             let flight_info = '';
             rows.forEach(element => {
@@ -268,7 +267,7 @@ app.get('/orig/:orig', (req, res) => {
             } else { // if there is at least one flight we can send the data like normal
                 response = response.replace('%%TOPIC%%', ('Origin Airport: ' + req.params.orig));
                 response = response.replace('%%FLIGHT_INFO%%', flight_info);
-                //console.log('images\\' + mfr + '_logo.png')
+                
                 res.status(200).type('html').send(response);
             }
         });
